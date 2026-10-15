@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Administrador - Tienda Oregón</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary: #ff5500;
+      --secondary: #0f172a;
+      --light-bg: #f8fafc;
+    }
+    body { background-color: var(--light-bg); font-family: 'Segoe UI', system-ui, sans-serif; }
+    .sidebar { width: 280px; min-height: 100vh; background: var(--secondary); color: #fff; position: fixed; }
+    .sidebar .nav-link { color: #94a3b8; padding: 12px 20px; font-weight: 500; border-radius: 8px; margin: 2px 10px; cursor: pointer; }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { color: #fff; background: var(--primary); }
+    .main-content { margin-left: 280px; padding: 30px; }
+    .card-kpi { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .badge-channel { background: #e0f2fe; color: #0369a1; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar d-flex flex-column justify-content-between p-3">
+  <div>
+    <div class="d-flex align-items-center gap-2 mb-4 px-2">
+      <img src="img/logo_oregon.png" alt="Logo" style="height: 40px; background: white; border-radius: 8px; padding: 2px;" onerror="this.style.display='none'">
+      <div>
+        <h5 class="fw-bold mb-0 text-white">Tienda Oregón</h5>
+        <small class="text-secondary" style="font-size: 0.75rem;">SGI - Módulo Jefatura</small>
+      </div>
+    </div>
+    <ul class="nav flex-column gap-1">
+      <li><a class="nav-link active" onclick="mostrarSeccion('sec-dashboard', this)"><i class="bi bi-speedometer2 me-2"></i> Dashboard General</a></li>
+      <li><a class="nav-link" onclick="mostrarSeccion('sec-catalogo', this)"><i class="bi bi-box-seam me-2"></i> Catálogo Maestro </a></li>
+      <li><a class="nav-link" onclick="mostrarSeccion('sec-compras', this)"><i class="bi bi-receipt me-2"></i> Compras y Facturas </a></li>
+      <li><a class="nav-link" onclick="mostrarSeccion('sec-ventas', this)"><i class="bi bi-file-earmark-excel me-2"></i> Carga Masiva</a></li>
+      <li><a class="nav-link" onclick="mostrarSeccion('sec-pedidos', this)"><i class="bi bi-truck me-2"></i> Pedidos y Despachos</a></li>
+      <li><a class="nav-link" onclick="mostrarSeccion('sec-auditoria', this)"><i class="bi bi-shield-check me-2"></i> Reportes y Auditoría</a></li>
+      <li><a class="nav-link" onclick="mostrarSeccion('sec-usuarios', this)"><i class="bi bi-people me-2"></i> Usuarios y Roles </a></li>
+    </ul>
+  </div>
+  <div class="border-top border-secondary pt-3 px-2">
+    <div class="small fw-bold text-light">Jefatura Administrativa</div>
+    <a href="index.html" class="text-danger small text-decoration-none"><i class="bi bi-box-arrow-left"></i> Salir del Sistema</a>
+  </div>
+</div>
+
+<!-- CONTENIDO PRINCIPAL -->
+<main class="main-content">
+
+  <!-- 1. DASHBOARD -->
+  <section id="sec-dashboard">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold text-dark">Dashboard General y Métricas</h3>
+        <p class="text-muted small">Supervisión integral de existencias, valorización contable y ventas del día.</p>
+      </div>
+      <button class="btn btn-outline-danger btn-sm" onclick="alert('Alerta preventiva enviada a compras.')"><i class="bi bi-bell"></i> 2 Quiebres Detectados</button>
+    </div>
+
+    <!-- KPIs Financieros y Operativos -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card card-kpi p-3 bg-white">
+          <small class="text-muted fw-bold">VALORIZACIÓN INVENTARIO</small>
+          <h4 class="fw-bold text-dark mt-2">$28.450.900</h4>
+          <span class="text-success small fw-semibold"><i class="bi bi-arrow-up-right"></i> 156 SKUs Activos</span>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-kpi p-3 bg-white">
+          <small class="text-muted fw-bold">STOCK CRÍTICO</small>
+          <h4 class="fw-bold text-danger mt-2">2 Artículos</h4>
+          <span class="text-danger small fw-semibold">Requiere Reorden</span>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-kpi p-3 bg-white">
+          <small class="text-muted fw-bold">VENTAS DEL DÍA</small>
+          <h4 class="fw-bold text-primary mt-2">48 Órdenes</h4>
+          <span class="text-muted small">Multicanal (Mkt + Web)</span>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-kpi p-3 bg-white">
+          <small class="text-muted fw-bold">MARGEN PROMEDIO</small>
+          <h4 class="fw-bold text-success mt-2">34.8%</h4>
+          <span class="text-success small">Utilidad bruta estimada</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Resumen Rápido -->
+    <div class="card border-0 shadow-sm p-4 bg-white">
+      <h6 class="fw-bold mb-3">Productos más Vendidos y Estado de Reposición</h6>
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>SKU</th>
+            <th>Producto</th>
+            <th>Marca</th>
+            <th>Ventas (Mes)</th>
+            <th>Stock Actual</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="fw-bold">TH-4500</td>
+            <td>Hervidor Eléctrico 1.7L</td>
+            <td>Thomas</td>
+            <td>142 un.</td>
+            <td>24 un.</td>
+            <td><span class="badge bg-success">Abastecido</span></td>
+          </tr>
+          <tr>
+            <td class="fw-bold">UT-FORNO</td>
+            <td>Horno Eléctrico 40L</td>
+            <td>Ursus Trotter</td>
+            <td>89 un.</td>
+            <td>3 un.</td>
+            <td><span class="badge bg-danger">Quiebre Inminente</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 2. CATÁLOGO MAESTRO (HU01 y HU02) -->
+  <section id="sec-catalogo" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold text-dark">Catálogo Maestro de Productos</h3>
+        <p class="text-muted small">Identificación única con SKU inmutable, costos de adquisición y precios por canal.</p>
+      </div>
+      <button class="btn btn-dark" onclick="simularNuevoProducto()"><i class="bi bi-plus-lg"></i> Crear Producto</button>
+    </div>
+
+    <div class="card border-0 shadow-sm p-3 bg-white">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle" id="tablaCatalogo">
+          <thead class="table-light">
+            <tr>
+              <th>SKU</th>
+              <th>Descripción / Modelo</th>
+              <th>Marca</th>
+              <th>Ubicación</th>
+              <th>Costo Neto ($)</th>
+              <th>Precio Web ($)</th>
+              <th>Precio Mayorista ($)</th>
+              <th>Stock Físico</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="fw-bold text-primary">TH-4500</td>
+              <td>Hervidor Eléctrico 1.7L</td>
+              <td>Thomas</td>
+              <td>Pasillo A - Estante 2</td>
+              <td class="fw-bold">$14.990</td>
+              <td>$22.990</td>
+              <td>$18.500</td>
+              <td>24 un.</td>
+              <td><button class="btn btn-sm btn-outline-secondary" onclick="alert('Simulación: Formulario de edición abierto')"><i class="bi bi-pencil"></i></button></td>
+            </tr>
+            <tr>
+              <td class="fw-bold text-primary">UT-FORNO</td>
+              <td>Horno Eléctrico 40L</td>
+              <td>Ursus Trotter</td>
+              <td>Pasillo B - Estante 1</td>
+              <td class="fw-bold">$45.990</td>
+              <td>$69.990</td>
+              <td>$56.900</td>
+              <td>4 un.</td>
+              <td><button class="btn btn-sm btn-outline-secondary" onclick="alert('Simulación: Formulario de edición abierto')"><i class="bi bi-pencil"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+<!-- 3. COMPRAS Y RECEPCIÓN (HU03) - BASADO EN FACTURA REAL SII -->
+  <section id="sec-compras" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">Módulo de Compras y Recepción </h3>
+        <p class="text-muted small mb-0">Ingreso formal de mercadería contra Factura Electrónica SII, desglose multiproducto y archivo digital en PDF.</p>
+      </div>
+      <span class="badge bg-danger px-3 py-2 fs-6">
+        <i class="bi bi-file-earmark-check me-1"></i> Factura Electrónica SII N° 54691
+      </span>
+    </div>
+
+    <!-- 1. CABECERA TRIBUTARIA Y ADJUNTO PDF -->
+    <div class="card border-0 shadow-sm p-4 bg-white mb-4">
+      <h6 class="fw-bold text-dark mb-3"><i class="bi bi-receipt-cutoff text-primary me-2"></i>1. Cabecera del Documento Tributario (Proveedor)</h6>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label small fw-bold">R.U.T. Proveedor *</label>
+          <input type="text" class="form-control form-control-sm" value="78.806.090-4" id="rutProv">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold">Razón Social Proveedor *</label>
+          <input type="text" class="form-control form-control-sm" value="GAMA CHILE S.A." id="nombreProv">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small fw-bold">N° Factura Electrónica *</label>
+          <input type="text" class="form-control form-control-sm fw-bold" value="54691" id="numFactura">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small fw-bold">Fecha de Emisión</label>
+          <input type="date" class="form-control form-control-sm" value="2026-09-22" id="fechaFactura">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small fw-bold">Forma de Pago</label>
+          <select class="form-select form-select-sm" id="formaPagoFactura">
+            <option selected>Contado</option>
+            <option>Crédito 30 días</option>
+            <option>Transferencia</option>
+          </select>
+        </div>
+
+        <!-- APARTADO VISUAL PARA SUBIR PDF -->
+        <div class="col-md-12 mt-3">
+          <label class="form-label small fw-bold text-dark">
+            <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i>Subir Documento de Factura (.PDF)
+          </label>
+          <div class="input-group">
+            <input type="file" class="form-control form-control-sm" accept=".pdf">
+            <button class="btn btn-outline-secondary btn-sm" type="button">
+              <i class="bi bi-upload me-1"></i> Adjuntar PDF
+            </button>
+          </div>
+          <small class="text-muted" style="font-size: 0.75rem;">Permite archivar digitalmente la factura tributaria oficial para respaldo contable y auditorías CIA.</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. DETALLE DE PRODUCTOS FACTURADOS -->
+    <div class="card border-0 shadow-sm p-4 bg-white mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold text-dark mb-0"><i class="bi bi-box-seam text-primary me-2"></i>2. Detalle de Ítems y Unidades Físicas Facturadas</h6>
+        <span class="text-muted small">Carga de artículos y costos netos de adquisición</span>
+      </div>
+
+      <!-- Fila para agregar nuevos ítems -->
+      <div class="row g-2 align-items-end p-3 bg-light rounded-3 mb-3 border">
+        <div class="col-md-4">
+          <label class="form-label small fw-bold">Producto / Modelo</label>
+          <select class="form-select form-select-sm" id="selectProdFactura">
+            <option value="GM-ELEGANCE|ALISADOR ELEGANCE ST KERA|GA.MA Italy|19406">GM-ELEGANCE - ALISADOR ELEGANCE ST KERA</option>
+            <option value="GM-KERATION|ALISADOR KERATION DIGITAL|GA.MA Italy|26465">GM-KERATION - ALISADOR KERATION DIGITAL</option>
+            <option value="GM-MISTRAL|SECADOR GAMA MISTRAL NEGRO|GA.MA Italy|13465">GM-MISTRAL - SECADOR GAMA MISTRAL NEGR</option>
+            <option value="GM-TITAN|SECADOR GAMA TITAN KERATIN|GA.MA Italy|14700">GM-TITAN - SECADOR GAMA TITAN KERATI</option>
+            <option value="GM-COCONUT|SECADOR GAMA COCONUT ST|GA.MA Italy|15876">GM-COCONUT - SECADOR GAMA COCONUT ST</option>
+            <option value="GM-INNOVA|CEPILLO INNOVA DIGITAL|GA.MA Italy|14700">GM-INNOVA - CEPILLO INNOVA DIGITAL</option>
+            <option value="GM-566-29|CORTAPELO GAMA 566 29 ACC|GA.MA Italy|20582">GM-566-29 - CORTAPELO GAMA 566 29 ACC</option>
+            <option value="GM-GCXMASTER|CORTAPELO GAMA GCXMASTER|GA.MA Italy|17641">GM-GCXMASTER - CORTAPELO GAMA GCXMASTER</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small fw-bold">Cantidad</label>
+          <input type="number" class="form-control form-control-sm text-center" id="cantProdFactura" value="1" min="1">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold">Precio Unitario Neto ($)</label>
+          <input type="number" class="form-control form-control-sm" id="costoProdFactura" value="19406">
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-dark btn-sm w-100 py-2 fw-semibold" onclick="agregarItemFactura()">
+            <i class="bi bi-plus-circle me-1"></i> Añadir Ítem a Factura
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabla Detalle Multiproducto precargada con datos de la Factura 54691 -->
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="tablaDetalleFactura">
+          <thead class="table-light">
+            <tr>
+              <th>SKU</th>
+              <th>Descripción del Producto</th>
+              <th>Marca</th>
+              <th class="text-center">Cantidad</th>
+              <th class="text-end">Precio Neto ($)</th>
+              <th class="text-end">Total Neto ($)</th>
+              <th class="text-center">Quitar</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyDetalleFactura">
+            <tr>
+              <td class="fw-bold text-primary">GM-ELEGANCE</td>
+              <td>ALISADOR ELEGANCE ST KERA</td>
+              <td><span class="badge bg-secondary">GA.MA</span></td>
+              <td class="text-center fw-bold">1 un.</td>
+              <td class="text-end">$19.406</td>
+              <td class="text-end fw-semibold">$19.406</td>
+              <td class="text-center"><button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="eliminarFilaFactura(this)">✕</button></td>
+            </tr>
+            <tr>
+              <td class="fw-bold text-primary">GM-KERATION</td>
+              <td>ALISADOR KERATION DIGITAL</td>
+              <td><span class="badge bg-secondary">GA.MA</span></td>
+              <td class="text-center fw-bold">1 un.</td>
+              <td class="text-end">$26.465</td>
+              <td class="text-end fw-semibold">$26.465</td>
+              <td class="text-center"><button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="eliminarFilaFactura(this)">✕</button></td>
+            </tr>
+            <tr>
+              <td class="fw-bold text-primary">GM-COCONUT</td>
+              <td>SECADOR GAMA COCONUT ST</td>
+              <td><span class="badge bg-secondary">GA.MA</span></td>
+              <td class="text-center fw-bold">2 un.</td>
+              <td class="text-end">$15.876</td>
+              <td class="text-end fw-semibold">$31.752</td>
+              <td class="text-center"><button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="eliminarFilaFactura(this)">✕</button></td>
+            </tr>
+            <tr>
+              <td class="fw-bold text-primary">GM-INNOVA</td>
+              <td>CEPILLO INNOVA DIGITAL</td>
+              <td><span class="badge bg-secondary">GA.MA</span></td>
+              <td class="text-center fw-bold">2 un.</td>
+              <td class="text-end">$14.700</td>
+              <td class="text-end fw-semibold">$29.400</td>
+              <td class="text-center"><button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="eliminarFilaFactura(this)">✕</button></td>
+            </tr>
+            <tr>
+              <td class="fw-bold text-primary">GM-566-29</td>
+              <td>CORTAPELO GAMA 566 29 ACC</td>
+              <td><span class="badge bg-secondary">GA.MA</span></td>
+              <td class="text-center fw-bold">2 un.</td>
+              <td class="text-end">$20.582</td>
+              <td class="text-end fw-semibold">$41.164</td>
+              <td class="text-center"><button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="eliminarFilaFactura(this)">✕</button></td>
+            </tr>
+            <tr>
+              <td class="fw-bold text-primary">GM-GCXMASTER</td>
+              <td>CORTAPELO GAMA GCXMASTER</td>
+              <td><span class="badge bg-secondary">GA.MA</span></td>
+              <td class="text-center fw-bold">1 un.</td>
+              <td class="text-end">$17.641</td>
+              <td class="text-end fw-semibold">$17.641</td>
+              <td class="text-center"><button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="eliminarFilaFactura(this)">✕</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 3. LIQUIDACIÓN DE TOTALES TRIBUTARIOS (SII) -->
+      <div class="row justify-content-end mt-4">
+        <div class="col-md-5">
+          <div class="card bg-light border p-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted small">Total Unidades Físicas:</span>
+              <strong id="totalUnidadesFactura">9 un.</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted small">MONTO NETO:</span>
+              <strong id="montoNetoFactura">$165.828</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted small">I.V.A. (19%):</span>
+              <strong id="montoIvaFactura">$31.507</strong>
+            </div>
+            <div class="d-flex justify-content-between border-top pt-2">
+              <span class="fw-bold text-dark fs-6">TOTAL FACTURADO:</span>
+              <span class="fw-bold text-danger fs-5" id="totalFacturaFinal">$197.335</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTÓN DE CONFIRMACIÓN -->
+      <div class="mt-4 pt-3 border-top text-end">
+        <button class="btn btn-success px-4 py-2 fw-bold" onclick="alert('✅ Factura N° 54691 registrada exitosamente.\nStock físico de bodega actualizado automáticamente.')">
+          <i class="bi bi-check2-circle me-1"></i> Confirmar Ingreso y Actualizar Stock en Bodega
+        </button>
+      </div>
+    </div>
+  </section>
+
+<!-- 4. CARGA MASIVA DE VENTAS (.XLSX) (HU04) -->
+  <section id="sec-ventas" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">Importación Masiva de Ventas Multicanal (HU04)</h3>
+        <p class="text-muted small mb-0">Carga planillas Excel (.xlsx) de Mercado Libre, Ripley, Paris o Mayoristas para rebajar stock en tiempo real.</p>
+      </div>
+      <!-- BOTÓN PARA DESCARGAR LA PLANILLA BASE (SIMULADO) -->
+      <button class="btn btn-outline-success btn-sm px-3 py-2 fw-semibold shadow-sm" onclick="alert('Descargando archivo base: Plantilla_Ventas_TiendaOregon.xlsx')">
+        <i class="bi bi-download me-1"></i> Descargar Plantilla Base (.xlsx)
+      </button>
+    </div>
+
+    <!-- TARJETA PRINCIPAL DE CARGA -->
+    <div class="card border-0 shadow-sm p-4 bg-white mb-4 text-center">
+      <div class="p-4 border border-2 border-dashed rounded-3 bg-light">
+        <i class="bi bi-file-earmark-excel-fill text-success" style="font-size: 3rem;"></i>
+        <h5 class="fw-bold mt-2 text-dark">Arrastre o seleccione el archivo .xlsx de ventas</h5>
+        <p class="text-muted small mb-3">
+          Formatos compatibles: Mercado Libre, Paris, Ripley, Venta Directa Web y Mayorista.<br>
+          <span class="text-secondary" style="font-size: 0.75rem;">(Columnas: RUT CLIENTE, NOMBRE CLIENTE, SKU, NOMBRE PRODUCTO, CANTIDAD, PRECIO, MARCA)</span>
+        </p>
+        
+        <div class="d-flex justify-content-center gap-2">
+          <!-- Botón de descarga alternativa dentro del área de carga (Simulado) -->
+          <button class="btn btn-outline-secondary btn-sm" onclick="alert('Descargando archivo base: Plantilla_Ventas_TiendaOregon.xlsx')">
+            <i class="bi bi-file-earmark-arrow-down me-1"></i> Obtener Formato Base
+          </button>
+          <!-- Botón que despliega la tabla de simulación -->
+          <button class="btn btn-dark btn-sm px-3" onclick="document.getElementById('box-preview-excel').style.display='block'">
+            <i class="bi bi-upload me-1"></i> Simular Carga de Planilla
+          </button>
+        </div>
+      </div>
+
+      <!-- TABLA DE PREVISUALIZACIÓN Y VALIDACIÓN (SIMULACIÓN VISUAL) -->
+      <div id="box-preview-excel" class="mt-4 text-start" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="fw-bold text-dark mb-0"><i class="bi bi-table text-primary me-1"></i> Previsualización y Validación de Filas (Lote #2026-10)</h6>
+          <span class="badge bg-success">3 Registros Validados</span>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover table-sm align-middle mb-0" style="font-size: 0.85rem;">
+            <thead class="table-light">
+              <tr>
+                <th>Canal Origen</th>
+                <th>RUT Cliente</th>
+                <th>Nombre Cliente</th>
+                <th>SKU Detectado</th>
+                <th>Producto</th>
+                <th class="text-center">Cantidad</th>
+                <th class="text-end">Precio ($)</th>
+                <th class="text-center">Validación Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge bg-warning text-dark">Mercado Libre</span></td>
+                <td>15.820.190-2</td>
+                <td>Distribuidora Villarrica</td>
+                <td class="fw-bold text-primary">TH-4500</td>
+                <td>Hervidor Eléctrico 1.7L</td>
+                <td class="text-center fw-bold">4 un.</td>
+                <td class="text-end">$22.990</td>
+                <td class="text-center"><span class="badge bg-success">Disponible (24 disp.)</span></td>
+              </tr>
+              <tr>
+                <td><span class="badge bg-info text-dark">Paris.cl</span></td>
+                <td>18.441.902-K</td>
+                <td>Constanza Morales</td>
+                <td class="fw-bold text-primary">UT-FORNO</td>
+                <td>Horno Eléctrico 40L</td>
+                <td class="text-center fw-bold">1 un.</td>
+                <td class="text-end">$69.990</td>
+                <td class="text-center"><span class="badge bg-success">Disponible (4 disp.)</span></td>
+              </tr>
+              <tr>
+                <td><span class="badge bg-dark">Mayorista B2B</span></td>
+                <td>77.345.120-4</td>
+                <td>Comercial del Sur SpA</td>
+                <td class="fw-bold text-primary">GM-ATTIVA</td>
+                <td>Alisador Ceramic Ion</td>
+                <td class="text-center fw-bold">6 un.</td>
+                <td class="text-end">$15.900</td>
+                <td class="text-center"><span class="badge bg-success">Disponible (18 disp.)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-3 text-end d-flex justify-content-between align-items-center">
+          <small class="text-muted"><i class="bi bi-info-circle me-1"></i> Al confirmar, se rebajará el stock físico y se crearán las órdenes para preparación en bodega.</small>
+          <button class="btn btn-success px-4 py-2 fw-bold shadow-sm" onclick="alert('Carga completada con éxito. Stock rebajado y lotes de preparación generados.'); document.getElementById('box-preview-excel').style.display='none';">
+            <i class="bi bi-lightning-charge me-1"></i> Confirmar Carga Atómica y Descontar Stock
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. GESTIÓN DE PEDIDOS Y DESPACHOS -->
+  <section id="sec-pedidos" style="display: none;">
+    <h3 class="fw-bold text-dark mb-2">Gestión de Pedidos y Despachos</h3>
+    <p class="text-muted small mb-4">Control del flujo: preparación en bodega y asignación a hoja de ruta para reparto.</p>
+
+    <div class="card border-0 shadow-sm p-3 bg-white">
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>N° Orden</th>
+            <th>Cliente / Destino</th>
+            <th>Canal</th>
+            <th>Ítems</th>
+            <th>Estado Operativo</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="fw-bold">#ORD-1024</td>
+            <td>Distribuidora Los Ríos (Temuco)</td>
+            <td>Mayorista</td>
+            <td>4 cajas (TH-4500)</td>
+            <td><span class="badge bg-info text-dark">En Picking (Bodega)</span></td>
+            <td><button class="btn btn-sm btn-outline-dark" onclick="alert('Asignado a hoja de ruta del Chofer.')">Asignar Chofer</button></td>
+          </tr>
+          <tr>
+            <td class="fw-bold">#ORD-1025</td>
+            <td>Juan Pérez (Villarrica)</td>
+            <td>Mercado Libre</td>
+            <td>1 bulto (UT-FORNO)</td>
+            <td><span class="badge bg-warning text-dark">En Ruta (Chofer)</span></td>
+            <td><button class="btn btn-sm btn-outline-success" onclick="alert('Seguimiento en vivo en mapa.')">Ver Ruta</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 6. AUDITORÍA Y REPORTES (HU10) -->
+  <section id="sec-auditoria" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold text-dark">Reportes y Bitácora de Auditoría (Audit Log)</h3>
+        <p class="text-muted small">Cumplimiento de la Tríada CIA: trazabilidad inmutable de todas las acciones del sistema.</p>
+      </div>
+      <div>
+        <button class="btn btn-outline-success btn-sm me-2" onclick="alert('Generando archivo Excel...')"><i class="bi bi-file-earmark-excel"></i> Exportar Excel</button>
+        <button class="btn btn-outline-danger btn-sm" onclick="alert('Generando archivo PDF...')"><i class="bi bi-file-earmark-pdf"></i> Exportar PDF</button>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-3 bg-white">
+      <table class="table table-sm align-middle font-monospace" style="font-size: 0.85rem;">
+        <thead class="table-light">
+          <tr>
+            <th>Fecha / Hora</th>
+            <th>Usuario</th>
+            <th>Rol</th>
+            <th>Acción Ejecutada</th>
+            <th>Módulo</th>
+            <th>IP Origen</th>
+          </tr>
+        </thead>
+        <tbody id="tablaLogs">
+          <tr>
+            <td>13/10/2026 14:22</td>
+            <td>Susana Cortes</td>
+            <td>Administrador</td>
+            <td>Importación masiva lote #201 (48 órdenes)</td>
+            <td>Ventas</td>
+            <td>192.168.1.15</td>
+          </tr>
+          <tr>
+            <td>13/10/2026 13:10</td>
+            <td>Operario Bodega 1</td>
+            <td>Bodega</td>
+            <td>Confirmación picking orden #ORD-1024</td>
+            <td>Bodega</td>
+            <td>192.168.1.42</td>
+          </tr>
+          <tr>
+            <td>13/10/2026 11:05</td>
+            <td>Conductor Reparto</td>
+            <td>Chofer</td>
+            <td>Marcado de entrega exitosa orden #ORD-1020</td>
+            <td>Ruta</td>
+            <td>186.105.88.12</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 7. USUARIOS Y ROLES (HU08) -->
+  <section id="sec-usuarios" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold text-dark">Administración de Usuarios y Roles</h3>
+        <p class="text-muted small">Gestión de accesos y restricción estricta de costos y márgenes al personal operativo.</p>
+      </div>
+      <button class="btn btn-dark btn-sm" onclick="alert('Simulación: Formulario de nuevo usuario abierto')"><i class="bi bi-person-plus"></i> Crear Usuario</button>
+    </div>
+
+    <div class="card border-0 shadow-sm p-3 bg-white">
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Nombre</th>
+            <th>Correo Electrónico</th>
+            <th>Rol Asignado</th>
+            <th>Acceso a Márgenes y Costos</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="fw-bold">Jefatura Administrativa</td>
+            <td>admin@tiendaoregon.cl</td>
+            <td><span class="badge bg-dark">Administrador</span></td>
+            <td class="text-success fw-bold">Permitido (Total)</td>
+            <td><span class="badge bg-success">Activo</span></td>
+          </tr>
+          <tr>
+            <td class="fw-bold">Juan Bodeguero</td>
+            <td>bodega@tiendaoregon.cl</td>
+            <td><span class="badge bg-secondary">Bodega</span></td>
+            <td class="text-danger fw-bold">Bloqueado / Oculto</td>
+            <td><span class="badge bg-success">Activo</span></td>
+          </tr>
+          <tr>
+            <td class="fw-bold">Carlos Chofer</td>
+            <td>chofer@tiendaoregon.cl</td>
+            <td><span class="badge bg-secondary">Chofer</span></td>
+            <td class="text-danger fw-bold">Bloqueado / Oculto</td>
+            <td><span class="badge bg-success">Activo</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Control simple de cambio de pestañas/módulos
+  function mostrarSeccion(idSeccion, elementoLink) {
+    document.querySelectorAll('main section').forEach(sec => sec.style.display = 'none');
+    document.getElementById(idSeccion).style.display = 'block';
+
+    if(elementoLink) {
+      document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
+      elementoLink.classList.add('active');
+    }
+  }
+
+  // Simulaciones interactivas
+  function simularNuevoProducto() {
+    alert("Simulación: Producto registrado en el catálogo maestro.");
+  }
+
+  function simularIngresoCompra() {
+    const factura = document.getElementById('numFactura').value || '1234';
+    const cant = document.getElementById('cantRecibida').value;
+    alert(`Entrada registrada: Factura #${factura}. Stock incrementado en ${cant} unidades.`);
+  }
+
+  function simularPrevisualizacionExcel() {
+    document.getElementById('box-preview-excel').style.display = 'block';
+  }
+
+  function simularEjecutarCarga() {
+    alert("Carga completada con éxito. Stock físico rebajado y lotes de preparación generados.");
+    document.getElementById('box-preview-excel').style.display = 'none';
+  }
+</script>
+</body>
+</html>

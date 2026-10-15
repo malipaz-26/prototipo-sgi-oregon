@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Inventario - Tienda Oregón</title>
+    <style>
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background:
+                url("img/fondo-bodega.jpg") center/cover no-repeat,
+                rgba(135, 122, 192, 0.619);
+            background-blend-mode: lighten;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* Header */
+        .header {
+            background: rgb(255, 255, 255);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            background: white;
+           
+        }
+
+        .system-name h1 {
+            font-size: 1.8rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .system-name span {
+            color: #ff5500;
+        }
+
+        /* Contenedor Principal */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        /* Tarjeta de Login */
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h2 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #ff5500;
+            box-shadow: 0 0 0 3px rgba(255, 85, 0, 0.15);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            color: #555;
+        }
+
+        /* Selector de Rol */
+        .role-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .role-selector h3 {
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .role-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .role-option {
+            text-align: center;
+            padding: 1rem 0.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            user-select: none;
+        }
+
+        .role-option:hover {
+            border-color: #ff5500;
+            transform: translateY(-2px);
+        }
+
+        .role-option.active {
+            border-color: #ffffff;
+            background: linear-gradient(135deg, #ff7733 0%, #e04b00 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .role-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .role-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Botón de Login */
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ff5500, #e04b00);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 85, 0, 0.35);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        /* Mensaje de Error */
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+            text-align: center;
+            border: 1px solid #fecaca;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.87);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: #555;
+            font-size: 0.9rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .support-info {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .support-link {
+            color: #ff5500;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .support-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container { padding: 1rem; }
+            .login-card { padding: 1.5rem; }
+            .role-options { grid-template-columns: 1fr; }
+            .logo-container { flex-direction: column; text-align: center; gap: 1rem; }
+            .system-name h1 { font-size: 1.4rem; }
+            .login-header h2 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo">
+                <img src="img/logo_oregon.png" alt="Tienda Oregón" onerror="this.src='img/fondo.png'">
+            </div>
+            <div class="system-name">
+                <h1>Sistema de Gestión de <span>Inventario</span></h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="main-container">
+        <!-- Tarjeta de Login -->
+        <div class="login-card" id="loginCard">
+            <div class="login-header">
+                <h2>Iniciar Sesión</h2>
+                <p>Accede a tu cuenta de Comercial Oregón</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" class="form-control" placeholder="Ingrese su usuario" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" class="form-control" placeholder="Ingrese su contraseña" required>
+                </div>
+
+                <!-- Selector de Rol (RBAC) -->
+                <div class="role-selector">
+                    <h3>Seleccione su rol:</h3>
+                    <div class="role-options">
+                        <div class="role-option active" data-role="administrador">
+                            <div class="role-icon">👨‍💼</div>
+                            <div class="role-name">Administrador</div>
+                        </div>
+                        <div class="role-option" data-role="bodega">
+                            <div class="role-icon">👷‍♂️</div>
+                            <div class="role-name">Bodega</div>
+                        </div>
+                        <div class="role-option" data-role="chofer">
+                            <div class="role-icon">🚚</div>
+                            <div class="role-name">Chofer</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="role" value="administrador">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Recordar usuario</label>
+                </div>
+
+                <button type="submit" class="btn-login">Iniciar Sesión</button>
+                
+                <div id="errorMsg" class="error-message">
+                    Credenciales incorrectas. Verifique usuario, contraseña y rol.
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="support-info">
+            Comercial Oregon SpA | Soporte técnico: 
+            <a href="mailto:soporte@tiendaoregon.cl" class="support-link">soporte@tiendaoregon.cl</a> | 
+            © 2026 Tienda Oregón
+        </div>
+    </footer>
+
+<script>
+    // --- Inicialización de usuarios por defecto en localStorage ---
+    function initData() {
+        if (!localStorage.getItem('oregon_initialized')) {
+            const users = [
+                { id: 1, username: 'admin', password: '123', name: 'Jefatura Comercial/Admin', role: 'administrador', email: 'admin@tiendaoregon.cl' },
+                { id: 2, username: 'bodega', password: '123', name: 'Operario de Bodega', role: 'bodega', email: 'bodega@tiendaoregon.cl' },
+                { id: 3, username: 'chofer', password: '123', name: 'Chofer de Reparto', role: 'chofer', email: 'chofer@tiendaoregon.cl' }
+            ];
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('oregon_initialized', 'true');
+        }
+    }
+
+    // --- Manejo interactivo de selección de rol ---
+    document.querySelectorAll('.role-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.role-option').forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            const selectedRole = this.getAttribute('data-role');
+            document.getElementById('role').value = selectedRole;
+        });
+    });
+
+    // --- Manejo del formulario de inicio de sesión ---
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
+        const remember = document.getElementById('remember').checked;
+        
+        document.getElementById('errorMsg').style.display = 'none';
+        initData();
+        
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const user = users.find(u => u.username === username && u.password === password && u.role === role);
+        
+        if (user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            localStorage.setItem('currentUserName', user.name);
+            localStorage.setItem('currentUserRole', user.role);
+            
+            if (remember) {
+                localStorage.setItem('rememberedUser', username);
+                localStorage.setItem('rememberedRole', role);
+            } else {
+                localStorage.removeItem('rememberedUser');
+                localStorage.removeItem('rememberedRole');
+            }
+            
+            // Redirección al archivo correspondiente según el rol
+            let redirectPage = 'administrador.html';
+            if (role === 'bodega') redirectPage = 'bodega.html';
+            if (role === 'chofer') redirectPage = 'chofer.html';
+            
+            window.location.href = redirectPage;
+        } else {
+            showError('Credenciales incorrectas. Verifique usuario, contraseña y rol.');
+        }
+    });
+
+    function showError(message) {
+        const errorDiv = document.getElementById('errorMsg');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
+    }
+
+    // --- Recordar usuario cargado previamente ---
+    document.addEventListener('DOMContentLoaded', function() {
+        initData();
+        const rememberedUser = localStorage.getItem('rememberedUser');
+        const rememberedRole = localStorage.getItem('rememberedRole');
+        
+        if (rememberedUser) {
+            document.getElementById('username').value = rememberedUser;
+            document.getElementById('remember').checked = true;
+            if (rememberedRole) {
+                document.getElementById('role').value = rememberedRole;
+                document.querySelectorAll('.role-option').forEach(opt => {
+                    opt.classList.remove('active');
+                    if (opt.getAttribute('data-role') === rememberedRole) {
+                        opt.classList.add('active');
+                    }
+                });
+            }
+        }
+        
+        document.getElementById('loginCard').style.opacity = '1';
+    });
+
+    document.getElementById('loginCard').style.opacity = '0';
+    document.getElementById('loginCard').style.transition = 'opacity 0.5s ease';
+</script>
+
+</body>
+</html>

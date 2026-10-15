@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bodega Móvil - Tienda Oregón</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    body { 
+      background-color: #f1f5f9; 
+      font-family: system-ui, -apple-system, sans-serif; 
+      padding-bottom: 95px; 
+    }
+    
+    /* Barra de navegación inferior táctil (PWA móvil) */
+    .bottom-nav { 
+      position: fixed; 
+      bottom: 0; 
+      left: 0; 
+      right: 0; 
+      background: #0f172a; 
+      display: flex; 
+      justify-content: space-around; 
+      padding: 10px 0; 
+      z-index: 1000; 
+      box-shadow: 0 -3px 12px rgba(0,0,0,0.12);
+    }
+    .bottom-nav button { 
+      background: none; 
+      border: none; 
+      color: #94a3b8; 
+      font-size: 0.8rem; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      transition: all 0.2s ease;
+    }
+    .bottom-nav button.active { 
+      color: #ff5500; 
+      font-weight: bold; 
+    }
+    
+    .card-touch { 
+      border-radius: 14px; 
+      border: none; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+      margin-bottom: 15px; 
+    }
+    .btn-touch { 
+      padding: 13px; 
+      font-size: 0.98rem; 
+      font-weight: bold; 
+      border-radius: 10px; 
+    }
+
+    /* Botonera de estados compacta (Pills) */
+    .status-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .btn-status-pill {
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      user-select: none;
+    }
+    .btn-status-pill:hover {
+      border-color: #94a3b8;
+      background: #e2e8f0;
+    }
+    .btn-status-pill.active-warning {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      color: #92400e;
+    }
+    .btn-status-pill.active-info {
+      background: #e0f2fe;
+      border-color: #0284c7;
+      color: #0369a1;
+    }
+    .btn-status-pill.active-primary {
+      background: #ede9fe;
+      border-color: #7c3aed;
+      color: #5b21b6;
+    }
+    .btn-status-pill.active-success {
+      background: #dcfce7;
+      border-color: #10b981;
+      color: #15803d;
+    }
+  </style>
+</head>
+<body class="p-3">
+
+  <!-- CABECERA PRINCIPAL -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center gap-2">
+      <img src="img/logo_oregon.png" alt="Logo" style="height: 36px; background: white; border-radius: 6px; padding: 2px;" onerror="this.style.display='none'">
+      <div>
+        <h6 class="fw-bold mb-0 text-dark">Tienda Oregón</h6>
+        <small class="text-muted" style="font-size: 0.75rem;">Panel bodega</small>
+      </div>
+    </div>
+    <a href="index.html" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right"></i> Salir</a>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- PESTAÑA 1: BUSCADOR RÁPIDO DE UBICACIONES Y STOCK (HU06)                  -->
+  <!-- ========================================================================= -->
+  <div id="tab-buscador">
+    <div class="card card-touch p-3 bg-white">
+      <label class="form-label small fw-bold text-muted">BÚSQUEDA RÁPIDA DE PASILLO Y STOCK</label>
+      <div class="input-group mb-2">
+        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search fs-5 text-primary"></i></span>
+        <input type="text" class="form-control form-control-lg border-start-0" placeholder="Escriba SKU o modelo..." id="inputBuscar" onkeyup="simularBusqueda()">
+      </div>
+      <small class="text-muted" style="font-size: 0.75rem;">Búsqueda predictiva optimizada para celular (< 2 segundos).</small>
+    </div>
+
+    <!-- Tarjeta de Resultado Rápido -->
+    <div class="card card-touch p-3 bg-white border-start border-4 border-warning" id="resultadoProducto">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <span class="badge bg-dark fs-6" id="resSKU">TH-4500</span>
+        <span class="badge bg-success fs-6" id="resStock">24 un. Físicas</span>
+      </div>
+      <h5 class="fw-bold mb-1" id="resNombre">Hervidor Eléctrico 1.7L</h5>
+      <p class="text-muted mb-2">Marca: <strong>Thomas</strong></p>
+      <div class="p-2 bg-light rounded text-center">
+        <small class="text-muted d-block">UBICACIÓN EN BODEGA</small>
+        <span class="fw-bold fs-5 text-dark"><i class="bi bi-geo-alt-fill text-danger"></i> Pasillo A - Estante 2</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- PESTAÑA 2: PICKING / PREPARACIÓN DE PEDIDOS (HU05)                        -->
+  <!-- ========================================================================= -->
+  <div id="tab-picking" style="display: none;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h5 class="fw-bold text-dark mb-0">Pedidos Pendientes</h5>
+        <small class="text-muted" style="font-size: 0.75rem;">Toque una orden para desplegar los productos a recolectar</small>
+      </div>
+      <span class="badge bg-dark px-2 py-1">2 Lotes Pendientes</span>
+    </div>
+
+    <!-- CONTENEDOR DE ÓRDENES -->
+    <div class="d-flex flex-column gap-3">
+
+      <!-- ========================================================================= -->
+      <!-- ORDEN 1: FALABELLA - 08 OCTUBRE (2UNIDADES EN TOTAL)                    -->
+      <!-- ========================================================================= -->
+      <div class="card card-touch bg-white shadow-sm border-0 overflow-hidden" style="border-radius: 14px;">
+        
+        <!-- CABECERA RESUMIDA SELECCIONABLE -->
+        <div class="p-3 border-start border-4 border-warning bg-white" onclick="togglePedido('detalle-falabella')" style="cursor: pointer; user-select: none;">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-dark fw-bold" style="font-size: 0.85rem;">Orden #MKP-FAL-0810</span>
+            <span class="badge bg-warning text-dark fw-bold" id="badge-estado-falabella">⏳ Pedido sin recolectar</span>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-end mt-2">
+            <div>
+              <div class="small text-muted"><i class="bi bi-calendar3 me-1"></i><strong>Fecha:</strong> 08/10/2026</div>
+              <h6 class="fw-bold text-dark mb-0 mt-1"><i class="bi bi-shop text-primary me-1"></i>Cliente: FALABELLA</h6>
+              <small class="text-muted">Despacho Consolidado Marketplace</small>
+            </div>
+            <div class="text-end">
+              <span class="badge bg-primary fs-6 px-3 py-1">2 productos en total</span>
+              <div class="small text-primary fw-semibold mt-1" id="texto-toggle-falabella">
+                Ver detalle <i class="bi bi-chevron-down ms-1"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CUERPO DESPLEGABLE ORDEN 1 -->
+        <div id="detalle-falabella" class="border-top p-3 bg-light" style="display: none;">
+          
+          <!-- BOTONERA DE ESTADOS COMPACTA Y BOTÓN DE ETIQUETAS -->
+          <div class="card p-3 mb-3 border-0 shadow-sm bg-white" style="border-radius: 12px;">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <div>
+                <small class="fw-bold text-muted d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                  <i class="bi bi-arrow-repeat text-primary me-1"></i>Cambiar Estado:
+                </small>
+                <div class="status-btn-group">
+                  <button type="button" class="btn-status-pill active-warning" onclick="seleccionarEstadoPill(this, 'badge-estado-falabella', '⏳ Pedido sin recolectar', 'active-warning')">
+                    ⏳ Sin recolectar
+                  </button>
+                  <button type="button" class="btn-status-pill" onclick="seleccionarEstadoPill(this, 'badge-estado-falabella', '📦 Pedido armado', 'active-info')">
+                    📦 Armado
+                  </button>
+                  <button type="button" class="btn-status-pill" onclick="seleccionarEstadoPill(this, 'badge-estado-falabella', '🏷️ Pedido etiquetado', 'active-primary')">
+                    🏷️ Etiquetado
+                  </button>
+                  <button type="button" class="btn-status-pill" onclick="seleccionarEstadoPill(this, 'badge-estado-falabella', '🚚 Cargado en el camión', 'active-success')">
+                    🚚 En camión
+                  </button>
+                </div>
+              </div>
+              <div>
+                <small class="fw-bold text-muted d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                  Documentos de despacho:
+                </small>
+                <button class="btn btn-outline-primary btn-sm px-3 py-1 fw-bold rounded-pill" style="font-size: 0.8rem;" onclick="alert('Descargando archivo térmico: Etiquetas_Falabella_08Oct_20bultos.pdf')">
+                  <i class="bi bi-printer me-1"></i> Descargar Etiquetas de este Pedido
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- LISTA DETALLADA DE PRODUCTOS FALABELLA -->
+          <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+            <span class="small fw-bold text-muted"><i class="bi bi-list-check me-1"></i>Detalle de productos a recolectar (2 unidades):</span>
+            <span class="small text-muted">Marque al recolectar</span>
+          </div>
+
+          <div class="d-flex flex-column gap-2 mb-3">
+
+            <div class="card p-2 border bg-white shadow-sm">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <input class="form-check-input fs-4 me-3 mt-0" type="checkbox" style="cursor: pointer;">
+                  <div>
+                    <span class="badge bg-dark me-1">SKU: TH-1870</span>
+                    <strong class="text-dark d-block">ASPIRADORA THOMAS TH-1870</strong>
+                    <div class="small text-muted">
+                      <i class="bi bi-geo-alt-fill text-danger me-1"></i>Ubicación: <strong>Pasillo B - Estante 2</strong> | 
+                      Cantidad: <span class="badge bg-primary fs-6">1 un.</span>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-outline-danger btn-sm px-2 py-1" onclick="abrirPanelComentario('TH-1870', 'Aspiradora Thomas TH-1870')">
+                  <i class="bi bi-chat-dots-fill me-1"></i> Comentarios
+                </button>
+              </div>
+            </div>
+
+            <div class="card p-2 border bg-white shadow-sm">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <input class="form-check-input fs-4 me-3 mt-0" type="checkbox" style="cursor: pointer;">
+                  <div>
+                    <span class="badge bg-dark me-1">SKU: TH-8832M</span>
+                    <strong class="text-dark d-block">BATIDORA THOMAS TH-8832M</strong>
+                    <div class="small text-muted">
+                      <i class="bi bi-geo-alt-fill text-danger me-1"></i>Ubicación: <strong>Pasillo A - Estante 3</strong> | 
+                      Cantidad: <span class="badge bg-primary fs-6">1 un.</span>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-outline-danger btn-sm px-2 py-1" onclick="abrirPanelComentario('TH-8832M', 'Batidora Thomas TH-8832M')">
+                  <i class="bi bi-chat-dots-fill me-1"></i> Comentarios
+                </button>
+              </div>
+            </div>
+
+
+
+
+
+          </div>
+
+          <!-- BOTÓN DE CONFIRMACIÓN DE LA ORDEN 1 -->
+          <button class="btn btn-success btn-touch w-100 py-3 fw-bold" onclick="alert('✅ ¡Orden de Falabella (2 unidades) completada con éxito!\nQuedó lista para revisión y entrega al chofer.')">
+            <i class="bi bi-check-all me-1"></i> Completar Recolección de Falabella
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- ORDEN 2: CELMEDIA - 05 OCTUBRE (12 UNIDADES EN TOTAL)                     -->
+      <!-- ========================================================================= -->
+      <div class="card card-touch bg-white shadow-sm border-0 overflow-hidden" style="border-radius: 14px;">
+        
+        <!-- CABECERA RESUMIDA SELECCIONABLE -->
+        <div class="p-3 border-start border-4 border-info bg-white" onclick="togglePedido('detalle-celmedia')" style="cursor: pointer; user-select: none;">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-dark fw-bold" style="font-size: 0.85rem;">Orden #ORD-CEL-0510</span>
+            <span class="badge bg-info text-dark fw-bold" id="badge-estado-celmedia">📦 Pedido armado</span>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-end mt-2">
+            <div>
+              <div class="small text-muted"><i class="bi bi-calendar3 me-1"></i><strong>Fecha:</strong> 05/10/2026</div>
+              <h6 class="fw-bold text-dark mb-0 mt-1"><i class="bi bi-building text-primary me-1"></i>Cliente: CELMEDIA</h6>
+              <small class="text-muted">Despacho Corporativo B2B</small>
+            </div>
+            <div class="text-end">
+              <span class="badge bg-primary fs-6 px-3 py-1">12 productos en total</span>
+              <div class="small text-primary fw-semibold mt-1" id="texto-toggle-celmedia">
+                Ver detalle <i class="bi bi-chevron-down ms-1"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CUERPO DESPLEGABLE ORDEN 2 -->
+        <div id="detalle-celmedia" class="border-top p-3 bg-light" style="display: none;">
+          
+          <!-- BOTONERA DE ESTADOS COMPACTA Y BOTÓN DE ETIQUETAS -->
+          <div class="card p-3 mb-3 border-0 shadow-sm bg-white" style="border-radius: 12px;">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <div>
+                <small class="fw-bold text-muted d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                  <i class="bi bi-arrow-repeat text-primary me-1"></i>Cambiar Estado:
+                </small>
+                <div class="status-btn-group">
+                  <button type="button" class="btn-status-pill" onclick="seleccionarEstadoPill(this, 'badge-estado-celmedia', '⏳ Pedido sin recolectar', 'active-warning')">
+                    ⏳ Sin recolectar
+                  </button>
+                  <button type="button" class="btn-status-pill active-info" onclick="seleccionarEstadoPill(this, 'badge-estado-celmedia', '📦 Pedido armado', 'active-info')">
+                    📦 Armado
+                  </button>
+                  <button type="button" class="btn-status-pill" onclick="seleccionarEstadoPill(this, 'badge-estado-celmedia', '🏷️ Pedido etiquetado', 'active-primary')">
+                    🏷️ Etiquetado
+                  </button>
+                  <button type="button" class="btn-status-pill" onclick="seleccionarEstadoPill(this, 'badge-estado-celmedia', '🚚 Cargado en el camión', 'active-success')">
+                    🚚 En camión
+                  </button>
+                </div>
+              </div>
+              <div>
+                <small class="fw-bold text-muted d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                  Documentos de despacho:
+                </small>
+                <button class="btn btn-outline-primary btn-sm px-3 py-1 fw-bold rounded-pill" style="font-size: 0.8rem;" onclick="alert('Descargando archivo térmico: Etiquetas_Celmedia_05Oct_12bultos.pdf')">
+                  <i class="bi bi-printer me-1"></i> Descargar Etiquetas de este Pedido
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- LISTA DETALLADA DE PRODUCTOS CELMEDIA -->
+          <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+            <span class="small fw-bold text-muted"><i class="bi bi-list-check me-1"></i>Detalle de productos a recolectar (12 unidades):</span>
+            <span class="small text-muted">Marque al recolectar</span>
+          </div>
+
+          <div class="d-flex flex-column gap-2 mb-3">
+
+            <div class="card p-2 border bg-white shadow-sm">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <input class="form-check-input fs-4 me-3 mt-0" type="checkbox" checked style="cursor: pointer;">
+                  <div>
+                    <span class="badge bg-dark me-1">SKU: AA-CAC28</span>
+                    <strong class="text-dark d-block">Cacerola Marmoleada 28 LT</strong>
+                    <div class="small text-muted">
+                      <i class="bi bi-geo-alt-fill text-danger me-1"></i>Ubicación: <strong>Pasillo F - Estante 1 (Arte Andino)</strong> | 
+                      Cantidad: <span class="badge bg-primary fs-6">1 un.</span>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-outline-danger btn-sm px-2 py-1" onclick="abrirPanelComentario('AA-CAC28', 'Cacerola Marmoleada 28 LT')">
+                  <i class="bi bi-chat-dots-fill me-1"></i> Incidencia
+                </button>
+              </div>
+            </div>
+
+            <div class="card p-2 border bg-white shadow-sm">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <input class="form-check-input fs-4 me-3 mt-0" type="checkbox" checked style="cursor: pointer;">
+                  <div>
+                    <span class="badge bg-dark me-1">SKU: AA-SAR24</span>
+                    <strong class="text-dark d-block">Sartén Marmoleado 24 CM</strong>
+                    <div class="small text-muted">
+                      <i class="bi bi-geo-alt-fill text-danger me-1"></i>Ubicación: <strong>Pasillo F - Estante 2 (Arte Andino)</strong> | 
+                      Cantidad: <span class="badge bg-primary fs-6">2 un.</span>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-outline-danger btn-sm px-2 py-1" onclick="abrirPanelComentario('AA-SAR24', 'Sartén Marmoleado 24 CM')">
+                  <i class="bi bi-chat-dots-fill me-1"></i> Incidencia
+                </button>
+              </div>
+            </div>
+
+            <div class="card p-2 border bg-white shadow-sm">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <input class="form-check-input fs-4 me-3 mt-0" type="checkbox" checked style="cursor: pointer;">
+                  <div>
+                    <span class="badge bg-dark me-1">SKU: AA-SAR28</span>
+                    <strong class="text-dark d-block">Sartén Marmoleado 28 CM</strong>
+                    <div class="small text-muted">
+                      <i class="bi bi-geo-alt-fill text-danger me-1"></i>Ubicación: <strong>Pasillo F - Estante 2 (Arte Andino)</strong> | 
+                      Cantidad: <span class="badge bg-primary fs-6">4 un.</span>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-outline-danger btn-sm px-2 py-1" onclick="abrirPanelComentario('AA-SAR28', 'Sartén Marmoleado 28 CM')">
+                  <i class="bi bi-chat-dots-fill me-1"></i> Incidencia
+                </button>
+              </div>
+            </div>
+
+            <div class="card p-2 border bg-white shadow-sm">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <input class="form-check-input fs-4 me-3 mt-0" type="checkbox" checked style="cursor: pointer;">
+                  <div>
+                    <span class="badge bg-dark me-1">SKU: DOR-MUN30</span>
+                    <strong class="text-dark d-block">Set Cuchillería Munich 30 Pzs Clásica Doral</strong>
+                    <div class="small text-muted">
+                      <i class="bi bi-geo-alt-fill text-danger me-1"></i>Ubicación: <strong>Pasillo E - Estante 3 (Doral)</strong> | 
+                      Cantidad: <span class="badge bg-primary fs-6">1 un.</span>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-outline-danger btn-sm px-2 py-1" onclick="abrirPanelComentario('DOR-MUN30', 'Set Cuchillería Munich Doral')">
+                  <i class="bi bi-chat-dots-fill me-1"></i> Incidencia
+                </button>
+              </div>
+            </div>
+
+            <div class="card p-2 border bg-white shadow-sm">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <input class="form-check-input fs-4 me-3 mt-0" type="checkbox" checked style="cursor: pointer;">
+                  <div>
+                    <span class="badge bg-dark me-1">SKU: GM-BAL2000</span>
+                    <strong class="text-dark d-block">Balanza Gama Med Grasa Mod 2000</strong>
+                    <div class="small text-muted">
+                      <i class="bi bi-geo-alt-fill text-danger me-1"></i>Ubicación: <strong>Pasillo D - Estante 2 (GA.MA)</strong> | 
+                      Cantidad: <span class="badge bg-primary fs-6">3 un.</span>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-outline-danger btn-sm px-2 py-1" onclick="abrirPanelComentario('GM-BAL2000', 'Balanza Gama Med Grasa')">
+                  <i class="bi bi-chat-dots-fill me-1"></i> Incidencia
+                </button>
+              </div>
+            </div>
+
+            <div class="card p-2 border bg-white shadow-sm">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <input class="form-check-input fs-4 me-3 mt-0" type="checkbox" checked style="cursor: pointer;">
+                  <div>
+                    <span class="badge bg-dark me-1">SKU: GM-EXTREME</span>
+                    <strong class="text-dark d-block">Cepillo Gama Innova Extreme Digital</strong>
+                    <div class="small text-muted">
+                      <i class="bi bi-geo-alt-fill text-danger me-1"></i>Ubicación: <strong>Pasillo C - Estante 2 (GA.MA)</strong> | 
+                      Cantidad: <span class="badge bg-primary fs-6">1 un.</span>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-outline-danger btn-sm px-2 py-1" onclick="abrirPanelComentario('GM-EXTREME', 'Cepillo Innova Extreme')">
+                  <i class="bi bi-chat-dots-fill me-1"></i> Incidencia
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- BOTÓN DE CONFIRMACIÓN DE LA ORDEN 2 -->
+          <button class="btn btn-success btn-touch w-100 py-3 fw-bold" onclick="alert('✅ ¡Orden de Celmedia (12 unidades) completada con éxito!')">
+            <i class="bi bi-check-all me-1"></i> Completar Recolección de Celmedia
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- MODAL PARA REGISTRAR INCIDENCIAS O COMENTARIOS -->
+    <div class="modal fade" id="modalIncidencia" tabindex="-1" style="display: none; background: rgba(0,0,0,0.5);">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
+          <div class="modal-header bg-light">
+            <h6 class="modal-title fw-bold text-dark">
+              <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>Registrar Incidencia / Comentario
+            </h6>
+            <button type="button" class="btn-close" onclick="cerrarPanelComentario()"></button>
+          </div>
+          <div class="modal-body p-3">
+            <div class="alert alert-warning py-2 px-3 small mb-3">
+              <span id="modalProductoInfo" class="fw-bold"></span>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-dark">Tipo de Problema detectado en bodega:</label>
+              <select class="form-select form-select-sm" id="tipoIncidenciaSelect">
+                <option value="Producto Dañado / Embalaje Roto">📦 Producto Dañado / Embalaje Roto</option>
+                <option value="Faltante Físico en Repisa">⚠️ Faltante Físico en Repisa</option>
+                <option value="Discrepancia en Cantidad">🔢 Discrepancia en Cantidad</option>
+                <option value="Código de Barra Ilegible">🏷️ Código de Barra Ilegible</option>
+                <option value="Otro motivo">📝 Otro motivo / Observación</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-dark">Observación o Comentario adicional (opcional):</label>
+              <textarea class="form-control form-control-sm" id="comentarioTexto" rows="3" placeholder="Ej: La caja exterior se encuentra golpeada en la esquina..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer bg-light p-2">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarPanelComentario()">Cancelar</button>
+            <button type="button" class="btn btn-danger btn-sm fw-bold px-3" onclick="guardarComentarioIncidencia()">
+              <i class="bi bi-send-fill me-1"></i> Guardar Comentario
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<!-- ========================================================================= -->
+  <!-- PESTAÑA 3: RECEPCIÓN FÍSICA EN RAMPA / DESPACHO (CHECKLIST)               -->
+  <!-- ========================================================================= -->
+  <div id="tab-rampa" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h5 class="fw-bold text-dark mb-0">Despacho | Descarga Camión</h5>
+        <small class="text-muted" style="font-size: 0.8rem;">Conteo y verificación física de bultos contra guía de despacho o factura</small>
+      </div>
+      <span class="badge bg-secondary px-2 py-1">Control de Entrada</span>
+    </div>
+
+    <div class="card card-touch p-3 bg-white shadow-sm border-0">
+      
+      <!-- Factura o Guía -->
+      <div class="mb-3">
+        <label class="form-label small fw-bold text-dark mb-1">
+          <i class="bi bi-file-earmark-text text-primary me-1"></i>Factura o Guía
+        </label>
+        <input type="text" class="form-control form-control-lg fs-6" placeholder="Ej: Factura 48920" id="inputGuiaDescarga" value="Factura 48920">
+      </div>
+
+      <!-- CHECKLIST DE BULTOS -->
+      <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="form-label small fw-bold text-muted mb-0" style="letter-spacing: 0.5px; text-transform: uppercase;">
+            <i class="bi bi-ui-checks text-success me-1"></i>Verificación Física de Bultos:
+          </label>
+          <small class="text-muted">Marque cada producto descargado conforme</small>
+        </div>
+
+        <div class="d-flex flex-column gap-2">
+          
+          <!-- Ítem 1 -->
+          <div class="card p-2 border bg-light shadow-sm" style="border-radius: 10px;">
+            <label class="form-check d-flex align-items-center justify-content-between m-0" style="cursor: pointer;">
+              <div class="d-flex align-items-center">
+                <input class="form-check-input fs-4 me-3 mt-0" type="checkbox" style="cursor: pointer;">
+                <div>
+                  <span class="badge bg-dark me-1" style="font-size: 0.72rem;">SKU: TH-4500</span>
+                  <strong class="text-dark d-block">Hervidor Thomas (TH-4500)</strong>
+                </div>
+              </div>
+              <span class="badge bg-primary fs-6 px-3 py-2">10 unidades</span>
+            </label>
+          </div>
+
+          <!-- Ítem 2 -->
+          <div class="card p-2 border bg-light shadow-sm" style="border-radius: 10px;">
+            <label class="form-check d-flex align-items-center justify-content-between m-0" style="cursor: pointer;">
+              <div class="d-flex align-items-center">
+                <input class="form-check-input fs-4 me-3 mt-0" type="checkbox" style="cursor: pointer;">
+                <div>
+                  <span class="badge bg-dark me-1" style="font-size: 0.72rem;">SKU: UT-FORNO</span>
+                  <strong class="text-dark d-block">Horno Forno 40 (UT-FORNO)</strong>
+                </div>
+              </div>
+              <span class="badge bg-primary fs-6 px-3 py-2">5 unidades</span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- BOTÓN DE CONFIRMACIÓN -->
+      <button class="btn btn-dark btn-touch w-100 py-3 fw-bold mt-2" onclick="alert('✅ Descarga física verificada con éxito.\nNotificación de mercadería conforme enviada a la Administración.')">
+        <i class="bi bi-box-arrow-in-down me-1"></i> Confirmar Descarga Conforme
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- BARRA DE NAVEGACIÓN INFERIOR FIJA (TÁCTIL)                                -->
+  <!-- ========================================================================= -->
+  <div class="bottom-nav">
+    <button class="active" onclick="cambiarTabBodega('tab-buscador', this)">
+      <i class="bi bi-search fs-5"></i>Buscador
+    </button>
+    <button onclick="cambiarTabBodega('tab-picking', this)">
+      <i class="bi bi-list-check fs-5"></i>Pedidos
+    </button>
+    <button onclick="cambiarTabBodega('tab-rampa', this)">
+      <i class="bi bi-truck fs-5"></i>Despacho
+    </button>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- SCRIPTS DE INTERACCIÓN                                                    -->
+  <!-- ========================================================================= -->
+  <script>
+    // 1. Navegación entre pestañas inferiores (Buscador, Picking, Rampa)
+    function cambiarTabBodega(tabId, btn) {
+      document.getElementById('tab-buscador').style.display = 'none';
+      document.getElementById('tab-picking').style.display = 'none';
+      document.getElementById('tab-rampa').style.display = 'none';
+      document.getElementById(tabId).style.display = 'block';
+
+      document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    // 2. Buscador rápido de pasillos y stock (HU06)
+    function simularBusqueda() {
+      const q = document.getElementById('inputBuscar').value.toUpperCase();
+      if(q.includes('UT') || q.includes('HORNO') || q.includes('FORNO')) {
+        document.getElementById('resSKU').textContent = 'UT-FORNO';
+        document.getElementById('resNombre').textContent = 'Horno Eléctrico 40L';
+        document.getElementById('resStock').textContent = '4 un. Físicas';
+      } else {
+        document.getElementById('resSKU').textContent = 'TH-4500';
+        document.getElementById('resNombre').textContent = 'Hervidor Eléctrico 1.7L';
+        document.getElementById('resStock').textContent = '24 un. Físicas';
+      }
+    }
+
+    // 3. Alternar despliegue de las órdenes y cambiar la flecha
+    function togglePedido(idDetalle) {
+      const el = document.getElementById(idDetalle);
+      const idIndicador = (idDetalle === 'detalle-falabella') 
+        ? 'texto-toggle-falabella' 
+        : 'texto-toggle-celmedia';
+        
+      const indicador = document.getElementById(idIndicador);
+
+      if (el.style.display === 'none' || el.style.display === '') {
+        el.style.display = 'block';
+        if (indicador) {
+          indicador.innerHTML = 'Ver detalle <i class="bi bi-chevron-up ms-1"></i>';
+        }
+      } else {
+        el.style.display = 'none';
+        if (indicador) {
+          indicador.innerHTML = 'Ver detalle <i class="bi bi-chevron-down ms-1"></i>';
+        }
+      }
+    }
+
+    // 4. Cambiar el estado con los botones compactos (Pills)
+    function seleccionarEstadoPill(btn, idBadge, textoEstado, claseActiva) {
+      const contenedor = btn.parentElement;
+      contenedor.querySelectorAll('.btn-status-pill').forEach(b => {
+        b.className = 'btn-status-pill';
+      });
+
+      btn.classList.add(claseActiva);
+
+      const badge = document.getElementById(idBadge);
+      if (badge) {
+        badge.textContent = textoEstado;
+        
+        if (claseActiva === 'active-warning') badge.className = 'badge bg-warning text-dark fw-bold';
+        if (claseActiva === 'active-info') badge.className = 'badge bg-info text-dark fw-bold';
+        if (claseActiva === 'active-primary') badge.className = 'badge bg-primary text-white fw-bold';
+        if (claseActiva === 'active-success') badge.className = 'badge bg-success text-white fw-bold';
+      }
+    }
+
+    // 5. Panel de comentarios e incidencias
+    let productoActualIncidencia = '';
+    function abrirPanelComentario(sku, nombreProd) {
+      productoActualIncidencia = `[${sku}] ${nombreProd}`;
+      document.getElementById('modalProductoInfo').textContent = productoActualIncidencia;
+      document.getElementById('comentarioTexto').value = '';
+      
+      const modal = document.getElementById('modalIncidencia');
+      modal.style.display = 'block';
+      modal.classList.add('show');
+    }
+
+    function cerrarPanelComentario() {
+      const modal = document.getElementById('modalIncidencia');
+      modal.style.display = 'none';
+      modal.classList.remove('show');
+    }
+
+    function guardarComentarioIncidencia() {
+      const tipo = document.getElementById('tipoIncidenciaSelect').value;
+      const nota = document.getElementById('comentarioTexto').value.trim();
+
+      alert(`⚠️ Incidencia registrada para ${productoActualIncidencia}:\n\n- Tipo: ${tipo}\n- Detalle: ${nota || 'Sin observaciones adicionales'}\n\nNotificación enviada a Jefatura.`);
+      cerrarPanelComentario();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruta Chofer - Tienda Oregón</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    body { 
+      background-color: #f8fafc; 
+      font-family: system-ui, -apple-system, sans-serif; 
+      padding-bottom: 30px;
+    }
+    .card-stop { 
+      border-radius: 14px; 
+      border: 1px solid #e2e8f0; 
+      margin-bottom: 16px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+    }
+    
+    /* Botón grande para abrir mapa GPS */
+    .btn-mapa-grande {
+      background: #eff6ff;
+      border: 2px solid #3b82f6;
+      color: #1d4ed8;
+      font-weight: 700;
+      padding: 12px;
+      font-size: 1.05rem;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+    .btn-mapa-grande:hover {
+      background: #3b82f6;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-action { 
+      padding: 12px; 
+      font-weight: 700; 
+      border-radius: 10px; 
+    }
+  </style>
+</head>
+<body class="p-3">
+
+  <!-- CABECERA DE RUTA -->
+  <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+    <div class="d-flex align-items-center gap-2">
+      <div class="bg-primary text-white rounded p-1 fs-5">
+        <i class="bi bi-truck"></i>
+      </div>
+      <div>
+        <h6 class="fw-bold mb-0 text-dark">Ruta de Reparto Diaria</h6>
+        <small class="text-muted" style="font-size: 0.75rem;">Chofer: Distribución Terreno</small>
+      </div>
+    </div>
+    <a href="index.html" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right"></i> Salir</a>
+  </div>
+
+  <!-- RESUMEN DE LA JORNADA EN SANTIAGO -->
+  <div class="alert alert-secondary py-2 px-3 small d-flex justify-content-between align-items-center mb-3">
+    <span><i class="bi bi-geo-alt-fill text-danger me-1"></i> <strong>Sector Santiago:</strong> Providencia - Las Condes - Santiago Centro</span>
+    <span class="badge bg-dark" id="badge-pendientes">3 Paradas Pendientes</span>
+  </div>
+
+  <!-- LISTADO DE PARADAS / ENTREGAS (HU07) -->
+  <div class="d-flex flex-column gap-3">
+
+    <!-- ==================== PARADA 1 ==================== -->
+    <div class="card card-stop p-3 bg-white" id="parada-1">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <span class="badge bg-dark fs-6">Parada 1: Orden #1024</span>
+        <span class="badge bg-warning text-dark fs-6" id="status-1">Pendiente</span>
+      </div>
+      
+      <h5 class="fw-bold text-dark mb-1">Distribuidora Oriente SpA</h5>
+      <p class="small text-muted mb-1 fs-6">
+        <i class="bi bi-geo-alt-fill text-danger"></i> <strong>Av. Providencia 1251, Providencia, Santiago</strong>
+      </p>
+      <p class="small text-muted mb-2">
+        <i class="bi bi-telephone-fill text-success"></i> +56 9 8765 4321 | <strong>Bultos: 4 cajas grandes</strong>
+      </p>
+
+      <!-- BOTÓN EN GRANDE PARA ABRIR MAPA GPS -->
+      <a class="btn-mapa-grande" href="https://www.google.com/maps/search/?api=1&query=Av.+Providencia+1251,+Providencia,+Santiago" target="_blank">
+        <i class="bi bi-map-fill fs-5"></i> Abrir Mapa
+      </a>
+
+      <!-- Botones de Acción de Entrega -->
+      <div class="d-flex gap-2" id="botones-1">
+        <button class="btn btn-success btn-action w-100" onclick="marcarEntregado(1, 'Distribuidora Oriente SpA')">
+          <i class="bi bi-check-circle me-1"></i> Entregado
+        </button>
+        <button class="btn btn-outline-danger btn-action w-100" onclick="abrirModalRechazo(1, 'Distribuidora Oriente SpA')">
+          <i class="bi bi-x-circle me-1"></i> Rechazado
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== PARADA 2 ==================== -->
+    <div class="card card-stop p-3 bg-white" id="parada-2">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <span class="badge bg-dark fs-6">Parada 2: Orden #1025</span>
+        <span class="badge bg-warning text-dark fs-6" id="status-2">Pendiente</span>
+      </div>
+      
+      <h5 class="fw-bold text-dark mb-1">Juan Pérez (Mercado Libre)</h5>
+      <p class="small text-muted mb-1 fs-6">
+        <i class="bi bi-geo-alt-fill text-danger"></i> <strong>Av. Apoquindo 4400, Las Condes, Santiago</strong>
+      </p>
+      <p class="small text-muted mb-2">
+        <i class="bi bi-telephone-fill text-success"></i> +56 9 1234 5678 | <strong>Bultos: 1 paquete (Microondas)</strong>
+      </p>
+
+      <!-- BOTÓN EN GRANDE PARA ABRIR MAPA GPS -->
+      <a class="btn-mapa-grande" href="https://www.google.com/maps/search/?api=1&query=Av.+Apoquindo+4400,+Las+Condes,+Santiago" target="_blank">
+        <i class="bi bi-map-fill fs-5"></i> Abrir Mapa
+      </a>
+
+      <!-- Botones de Acción de Entrega -->
+      <div class="d-flex gap-2" id="botones-2">
+        <button class="btn btn-success btn-action w-100" onclick="marcarEntregado(2, 'Juan Pérez')">
+          <i class="bi bi-check-circle me-1"></i> Entregado
+        </button>
+        <button class="btn btn-outline-danger btn-action w-100" onclick="abrirModalRechazo(2, 'Juan Pérez')">
+          <i class="bi bi-x-circle me-1"></i> Rechazado
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== PARADA 3 ==================== -->
+    <div class="card card-stop p-3 bg-white" id="parada-3">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <span class="badge bg-dark fs-6">Parada 3: Orden #1026</span>
+        <span class="badge bg-warning text-dark fs-6" id="status-3">Pendiente</span>
+      </div>
+      
+      <h5 class="fw-bold text-dark mb-1">Constanza Morales (Paris.cl)</h5>
+      <p class="small text-muted mb-1 fs-6">
+        <i class="bi bi-geo-alt-fill text-danger"></i> <strong>Av. Libertador Bernardo O'Higgins 1449, Santiago Centro</strong>
+      </p>
+      <p class="small text-muted mb-2">
+        <i class="bi bi-telephone-fill text-success"></i> +56 9 9876 1122 | <strong>Bultos: 2 paquetes</strong>
+      </p>
+
+      <!-- BOTÓN EN GRANDE PARA ABRIR MAPA GPS -->
+      <a class="btn-mapa-grande" href="https://www.google.com/maps/search/?api=1&query=Av.+Libertador+Bernardo+O'Higgins+1449,+Santiago" target="_blank">
+        <i class="bi bi-map-fill fs-5"></i> Abrir Mapa 
+      </a>
+
+      <!-- Botones de Acción de Entrega -->
+      <div class="d-flex gap-2" id="botones-3">
+        <button class="btn btn-success btn-action w-100" onclick="marcarEntregado(3, 'Constanza Morales')">
+          <i class="bi bi-check-circle me-1"></i> Entregado
+        </button>
+        <button class="btn btn-outline-danger btn-action w-100" onclick="abrirModalRechazo(3, 'Constanza Morales')">
+          <i class="bi bi-x-circle me-1"></i> Rechazado
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SCRIPTS DE SIMULACIÓN -->
+  <script>
+    let pendientes = 3;
+
+    function marcarEntregado(id, cliente) {
+      document.getElementById(`status-${id}`).className = 'badge bg-success fs-6';
+      document.getElementById(`status-${id}`).textContent = 'Entregado con Éxito';
+      
+      document.getElementById(`botones-${id}`).innerHTML = `
+        <div class="alert alert-success w-100 py-2 mb-0 text-center small fw-bold">
+          <i class="bi bi-check-circle-fill me-1"></i> Entrega liquidada en el sistema para ${cliente}
+        </div>`;
+
+      pendientes = Math.max(0, pendientes - 1);
+      document.getElementById('badge-pendientes').textContent = `${pendientes} Paradas Pendientes`;
+      
+      alert(`✅ Entrega exitosa confirmada:\n- Cliente: ${cliente}\n- Registrado con fecha, hora y geolocalización en el Audit Log.`);
+    }
+
+    function abrirModalRechazo(id, cliente) {
+      const motivo = prompt(
+        `LIQUIDACIÓN DE RECHAZO - ${cliente}\n\nSeleccione el motivo estándar:\n1. Dirección incorrecta / no encontrada\n2. Morador ausente en domicilio\n3. Producto rechazado por cliente`,
+        "Morador ausente en domicilio"
+      );
+
+      if (motivo) {
+        document.getElementById(`status-${id}`).className = 'badge bg-danger fs-6';
+        document.getElementById(`status-${id}`).textContent = 'Rechazado';
+        
+        document.getElementById(`botones-${id}`).innerHTML = `
+          <div class="alert alert-danger w-100 py-2 mb-0 text-center small fw-bold">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> Rechazado: ${motivo}
+          </div>`;
+
+        pendientes = Math.max(0, pendientes - 1);
+        document.getElementById('badge-pendientes').textContent = `${pendientes} Paradas Pendientes`;
+        
+        alert(`⚠️ Parada registrada como rechazada:\n- Causal: ${motivo}\n- Notificación enviada a la Administración.`);
+      }
+    }
+  </script>
+</body>
+</html>
